@@ -1,53 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Random Name Wheel</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Random Name Wheel</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}
+body{background:linear-gradient(135deg,#142433,#21364d);min-height:100vh;display:flex;justify-content:center;align-items:center;overflow-x:hidden;color:#fff;}
+.card{width:1100px;max-width:95%;padding:25px;border-radius:28px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px);box-shadow:0 25px 50px rgba(0,0,0,.45);text-align:center;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+h1{font-size:42px;color:#ffe48c;}
+.settings-btn{border:none;background:#ffca55;padding:12px 18px;border-radius:30px;font-weight:700;cursor:pointer;}
+.wrapper{display:flex;gap:25px;flex-wrap:wrap;justify-content:center;align-items:flex-start;}
+
+canvas{width:420px;height:420px;border-radius:50%;background:#222;cursor:pointer;box-shadow:0 18px 35px rgba(0,0,0,.45);}
+
+.result{margin-top:18px;padding:25px;min-height:140px;border-radius:24px;font-size:56px;font-weight:900;display:flex;justify-content:center;align-items:center;background:#183243;border:2px dashed gold;}
+.celebrate{animation:zoom .6s infinite alternate;background:linear-gradient(135deg,#ffd54f,#ff8a00);color:#132535;text-shadow:0 0 18px #fff;}
+@keyframes zoom{from{transform:scale(1)}to{transform:scale(1.08)}}
+
+.panel{width:360px;max-width:100%;}
+.settings{display:none;margin-top:15px;padding:18px;border-radius:20px;background:#10202d;}
+.settings.show{display:block;}
+
+textarea{width:100%;height:150px;border:none;border-radius:14px;padding:12px;}
+.action-row{display:flex;gap:10px;margin-top:12px;}
+.action-btn{flex:1;border:none;padding:12px;border-radius:25px;font-weight:700;cursor:pointer;}
+.green{background:#35b56a;color:#fff;}
+.red{background:#d85b5b;color:#fff;}
+
+.small{margin-top:10px;font-size:14px;color:#ddd;}
+.recent{margin-top:12px;max-height:180px;overflow:auto;background:#173040;padding:10px;border-radius:14px;}
+.recent-item{padding:8px;margin-bottom:7px;background:#23465e;border-radius:10px;cursor:pointer;}
+
+#choiceButtons{display:none;gap:10px;margin-top:10px;}
+
+.pointer{
+position:absolute;
+top:-5px;
+left:50%;
+transform:translateX(-50%);
+width:0;height:0;
+border-left:18px solid transparent;
+border-right:18px solid transparent;
+border-top:30px solid gold;
+z-index:10;
+}
+
+/* celebration */
+.confetti-piece{position:fixed;width:12px;height:18px;top:-20px;pointer-events:none;z-index:9999;animation:fall linear forwards;}
+@keyframes fall{0%{transform:translateY(0)}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.firework{position:fixed;width:10px;height:10px;border-radius:50%;pointer-events:none;z-index:9999;animation:explode .9s ease-out forwards;
+box-shadow:0 -40px currentColor,0 40px currentColor,40px 0 currentColor,-40px 0 currentColor;}
+@keyframes explode{0%{transform:scale(.1)}100%{transform:scale(1.8);opacity:0}}
+.disco-light{position:fixed;inset:0;pointer-events:none;z-index:9998;animation:flash .7s linear 4;}
+@keyframes flash{0%{background:rgba(255,0,0,.14)}25%{background:rgba(0,255,255,.14)}50%{background:rgba(255,255,0,.14)}75%{background:rgba(255,0,255,.14)}100%{background:rgba(0,255,0,.14)}}
+</style>
 </head>
+
 <body>
 
-    <div class="card">
-        <div class="topbar">
-            <h1>🎡 ބުރު އަނބުރާ</h1>
-            <h1>ޤުރުއާން ގަޑި - ގުރޭޑް 3</h1>
-            <button class="settings-btn" id="toggleSettings">⚙ Settings</button>
-        </div>
+<div class="card">
+<div class="topbar">
+<h1>🎡 ބުރު އަނބުރާ</h1>
+<button class="settings-btn" id="toggleSettings" aria-label="Settings">
+  <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round">
+       
+    <circle cx="12" cy="12" r="3"></circle>
+    
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06
+             a2 2 0 1 1-2.83 2.83l-.06-.06
+             a1.65 1.65 0 0 0-1.82-.33
+             1.65 1.65 0 0 0-1 1.51V21
+             a2 2 0 1 1-4 0v-.09
+             a1.65 1.65 0 0 0-1-1.51
+             1.65 1.65 0 0 0-1.82.33l-.06.06
+             a2 2 0 1 1-2.83-2.83l.06-.06
+             a1.65 1.65 0 0 0 .33-1.82
+             1.65 1.65 0 0 0-1.51-1H3
+             a2 2 0 1 1 0-4h.09
+             a1.65 1.65 0 0 0 1.51-1
+             1.65 1.65 0 0 0-.33-1.82l-.06-.06
+             a2 2 0 1 1 2.83-2.83l.06.06
+             a1.65 1.65 0 0 0 1.82.33h0
+             a1.65 1.65 0 0 0 1-1.51V3
+             a2 2 0 1 1 4 0v.09
+             a1.65 1.65 0 0 0 1 1.51
+             1.65 1.65 0 0 0 1.82-.33l.06-.06
+             a2 2 0 1 1 2.83 2.83l-.06.06
+             a1.65 1.65 0 0 0-.33 1.82v0
+             a1.65 1.65 0 0 0 1.51 1H21
+             a2 2 0 1 1 0 4h-.09
+             a1.65 1.65 0 0 0-1.51 1z">
+    </path>
+    
+  </svg>
+</button>
+</div>
 
-        <div class="wrapper">
-            <div style="position:relative;">
-                <div class="pointer"></div>
-                <canvas id="wheel" width="500" height="500"></canvas>
-                <div class="small">އަނބުރާލާ</div>
-            </div>
+<div class="wrapper">
 
-            <div class="panel">
-                <div id="winner" class="result">✨ ތައްޔާރުތަ؟ ✨</div>
+<div style="position:relative;">
+<div class="pointer"></div>
+<canvas id="wheel" width="500" height="500"></canvas>
+<div class="Xlarge">!... އަނބުރާލާ </div>
+</div>
 
-                <div id="choiceButtons">
-                    <button class="action-btn green" id="keepBtn">KEEP</button>
-                    <button class="action-btn red" id="removeBtn">REMOVE</button>
-                </div>
+<div class="panel">
+<div id="winner" class="result">✨ ތައްޔާރުތަ؟ ✨</div>
 
-                <div class="settings" id="settingsPanel">
-                    <label>Add names</label>
-                    <textarea id="bulkNames"></textarea>
+<div id="choiceButtons">
+  <button class="action-btn green" id="keepBtn" style="font-size:20px;">
+    ނަން ބައިންދާ
+  </button>
+  
+  <button class="action-btn red" id="removeBtn" style="font-size:20px;">
+    ނަން އުނިކޮށްލާ
+  </button>
+</div>
+<div class="settings" id="settingsPanel">
+<label>Add names</label>
+<textarea id="bulkNames"></textarea>
 
-                    <div class="action-row">
-                        <button class="action-btn green" id="loadBtn">Add</button>
-                        <button class="action-btn red" id="clearBtn">Clear</button>
-                    </div>
+<div class="action-row">
+<button class="action-btn green" id="loadBtn">Add</button>
+<button class="action-btn red" id="clearBtn">Clear</button>
+</div>
 
-                    <label>Spin Duration <span id="secText">10</span>s</label>
-                    <input type="range" id="duration" min="5" max="15" value="10">
+<label>Spin Duration <span id="secText">10</span></label>
+<input type="range" id="duration" min="5" max="15" value="10">
 
-                    <div class="recent" id="recentList"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="recent" id="recentList"></div>
+</div>
+</div>
 
-    <script src="script.js"></script>
+</div>
+</div>
+
+<script>
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+const winnerBox=document.getElementById("winner");
+
+let names=["Ali","Sara","Ahmed","Zara","Aisha"];
+let rotation=0,spinning=false,spinDuration=10,currentWinner=null;
+
+function color(i,t){return `hsl(${(360/t)*i},80%,62%)`;}
+
+function drawWheel(){
+ctx.clearRect(0,0,500,500);
+if(!names.length)return;
+
+const slice=(Math.PI*2)/names.length;
+
+names.forEach((n,i)=>{
+const s=i*slice+rotation,e=s+slice;
+
+ctx.beginPath();
+ctx.moveTo(250,250);
+ctx.arc(250,250,220,s,e);
+ctx.fillStyle=color(i,names.length);
+ctx.fill();
+
+ctx.save();
+ctx.translate(250,250);
+ctx.rotate(s+slice/2);
+ctx.textAlign="right";
+ctx.fillStyle="#111";
+ctx.font="bold 24px sans-serif";
+ctx.fillText(n,180,8);
+ctx.restore();
+});
+}
+
+function spin(){
+if(spinning||!names.length)return;
+
+spinning=true;
+currentWinner=null;
+choiceButtons.style.display="none";
+
+winnerBox.classList.remove("celebrate");
+winnerBox.innerHTML="!...މަޑުކޮށްލާ";
+
+let start=performance.now();
+let total=spinDuration*1000;
+let totalRotation=Math.PI*20+Math.random()*8;
+
+function frame(now){
+let p=Math.min((now-start)/total,1);
+let ease=1-Math.pow(1-p,3);
+
+rotation=totalRotation*ease;
+drawWheel();
+
+if(p<1)requestAnimationFrame(frame);
+else{spinning=false;pickWinner();}
+}
+requestAnimationFrame(frame);
+}
+
+function pickWinner(){
+const slice=(Math.PI*2)/names.length;
+const pointerAngle=(Math.PI*1.5 - rotation)%(Math.PI*2);
+const index=Math.floor(((pointerAngle+Math.PI*2)%(Math.PI*2))/slice);
+
+currentWinner=names[index];
+
+winnerBox.innerHTML="🎉 "+currentWinner+" 🎉";
+winnerBox.classList.add("celebrate");
+
+choiceButtons.style.display="flex";
+celebrate();
+}
+
+function celebrate(){
+const disco=document.createElement("div");
+disco.className="disco-light";
+document.body.appendChild(disco);
+setTimeout(()=>disco.remove(),3000);
+
+for(let i=0;i<120;i++){
+let c=document.createElement("div");
+c.className="confetti-piece";
+c.style.left=Math.random()*100+"vw";
+c.style.background=`hsl(${Math.random()*360},95%,60%)`;
+c.style.animationDuration=(2+Math.random()*3)+"s";
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),4000);
+}
+
+for(let i=0;i<6;i++){
+setTimeout(()=>{
+let f=document.createElement("div");
+f.className="firework";
+f.style.left=Math.random()*80+"vw";
+f.style.top=Math.random()*60+"vh";
+f.style.color=`hsl(${Math.random()*360},100%,60%)`;
+document.body.appendChild(f);
+setTimeout(()=>f.remove(),1000);
+},i*250);
+}
+}
+
+keepBtn.onclick=()=>choiceButtons.style.display="none";
+
+removeBtn.onclick=()=>{
+names=names.filter(n=>n!==currentWinner);
+choiceButtons.style.display="none";
+drawWheel();
+};
+
+toggleSettings.onclick=()=>settingsPanel.classList.toggle("show");
+
+loadBtn.onclick=()=>{
+let txt=bulkNames.value.trim();
+if(!txt)return;
+names=[...new Set(txt.split(/\n|,/).map(x=>x.trim()).filter(Boolean))];
+drawWheel();
+};
+
+clearBtn.onclick=()=>{names=[];drawWheel();};
+
+duration.oninput=e=>{
+spinDuration=e.target.value;
+secText.textContent=spinDuration;
+};
+
+canvas.onclick=spin;
+drawWheel();
+</script>
+
 </body>
 </html>
