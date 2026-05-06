@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Random Name Wheel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="card">
+        <div class="topbar">
+            <h1>🎡 ބުރު އަނބުރާ</h1>
+            <h1>ޤުރުއާން ގަޑި - ގުރޭޑް 3</h1>
+            <button class="settings-btn" id="toggleSettings">⚙ Settings</button>
+        </div>
+
+        <div class="wrapper">
+            <div style="position:relative;">
+                <div class="pointer"></div>
+                <canvas id="wheel" width="500" height="500"></canvas>
+                <div class="small">އަނބުރާލާ</div>
+            </div>
+
+            <div class="panel">
+                <div id="winner" class="result">✨ ތައްޔާރުތަ؟ ✨</div>
+
+                <div id="choiceButtons">
+                    <button class="action-btn green" id="keepBtn">KEEP</button>
+                    <button class="action-btn red" id="removeBtn">REMOVE</button>
+                </div>
+
+                <div class="settings" id="settingsPanel">
+                    <label>Add names</label>
+                    <textarea id="bulkNames"></textarea>
+
+                    <div class="action-row">
+                        <button class="action-btn green" id="loadBtn">Add</button>
+                        <button class="action-btn red" id="clearBtn">Clear</button>
+                    </div>
+
+                    <label>Spin Duration <span id="secText">10</span>s</label>
+                    <input type="range" id="duration" min="5" max="15" value="10">
+
+                    <div class="recent" id="recentList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
